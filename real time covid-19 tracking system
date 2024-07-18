@@ -1,0 +1,23 @@
+import requests
+BASE_URL = 'https://disease.sh/v3/covid-19/'
+def fetch_covid_stats(region, region_type='countries'):
+    url = f"{BASE_URL}{region_type}/{region}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None
+def display_covid_stats(data):
+    if data:
+        print(f"COVID-19 Statistics for {data['country']}:")
+        print(f"Cases: {data['cases']}")
+        print(f"Recovered: {data['recovered']}")
+        print(f"Deaths: {data['deaths']}")
+    else:
+        print("Unable to fetch COVID-19 statistics. Please check the region or try again later.")
+def main():
+    region = input("Enter the region (country): ")
+    covid_data = fetch_covid_stats(region)
+    display_covid_stats(covid_data)
+if __name__ == "__main__":
+    main()
