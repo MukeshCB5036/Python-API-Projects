@@ -1,0 +1,53 @@
+import datetime
+import random
+class Product:
+    def __init__(self, product_id, name, stock_level, reorder_point, lead_time, sales_history):
+        self.product_id = product_id
+        self.name = name
+        self.stock_level = stock_level
+        self.reorder_point = reorder_point
+        self.lead_time = lead_time
+        self.sales_history = sales_history
+products = [
+    Product('001', 'Product A', 100, 50, 5, [10, 12, 8, 7, 10, 11, 9]),
+    Product('002', 'Product B', 200, 100, 7, [15, 14, 16, 18, 15, 17, 13])
+]
+def track_inventory(sales_data):
+    for sale in sales_data:
+        product = next((p for p in products if p.product_id == sale['product_id']), None)
+        if product:
+            product.stock_level -= sale['quantity']
+            if product.stock_level < product.reorder_point:
+                print(f"Alert: {product.name} stock level below reorder point! Current stock: {product.stock_level}")
+def calculate_reorder_points():
+    for product in products:
+        avg_sales = sum(product.sales_history) / len(product.sales_history)
+        reorder_quantity = avg_sales * product.lead_time
+        print(f"Reorder {reorder_quantity} units of {product.name}")
+def generate_reports():
+    for product in products:
+        turnover_rate = sum(product.sales_history) / ((product.stock_level + sum(product.sales_history)) / 2)
+        stockout_occurrences = sum(1 for sale in product.sales_history if sale > product.stock_level)
+        overstock_cost = (product.stock_level - sum(product.sales_history)) * 1.2  # Assume 20% cost for overstock
+        print(f"{product.name} - Turnover Rate: {turnover_rate}, Stockouts: {stockout_occurrences}, Overstock Cost: ${overstock_cost:.2f}")
+def display_inventory(product_id):
+    product = next((p for p in products if p.product_id == product_id), None)
+    if product:
+        print(f"Product: {product.name}")
+        print(f"Current Stock Level: {product.stock_level}")
+        print(f"Reorder Point: {product.reorder_point}")
+        print(f"Lead Time: {product.lead_time} days")
+        calculate_reorder_points()
+    else:
+        print("Product not found.")
+def main():
+    sales_data = [
+        {'product_id': '001', 'quantity': 10},
+        {'product_id': '002', 'quantity': 20}
+    ]
+    track_inventory(sales_data)
+    generate_reports()
+    product_id = input("Enter the product ID: ")
+    display_inventory(product_id)
+if __name__ == "__main__":
+    main()
